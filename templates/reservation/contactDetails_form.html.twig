@@ -1,0 +1,61 @@
+{% extends 'base.html.twig' %}
+        {% block stylesheets %}
+        {{ parent() }}
+        {% endblock %}
+{% block title %}Detalle de la reserva{% endblock %}
+
+{% block body %}
+    <h1>Detalle de la reserva</h1>
+
+    <div class="row">
+        <div class="col">
+            <div class="container p-3 m-2"style="border:1px solid #000000; width:initial">
+                <div class="row pb-3">
+                    <h4>Datos reserva</h4>
+                </div>
+                <div class="row pb-3">
+                    <div class="col">
+                        <label><strong>Fecha entrada: </strong>{{dates[0]}}</label>
+                    </div>
+                    <div class="col">
+                        <label><strong>Fecha salida: </strong>{{dates[1]}}</label>
+                    </div>
+                </div>
+                <div class="row pb-3">
+                    <div class="col">
+                        <label><strong>Tipo de habitación: </strong>{{typeRoom.name}}</label>
+                    </div>
+                    <div class="col">
+                        <label><strong>Número huéspedes: </strong>{{numberGuests}}</label>
+                    </div>
+                </div>
+                <div class="row pb-3">
+                    <div class="col">
+                        <label><strong>Precio total: </strong>{{totalDays * typeRoom.PriceDay}}€</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <form action="{{ path('app_reservation_new') }}" method="post">
+                <div class="mb-3">
+                    <label for="nameInput" class="form-label">Nombre: </label>
+                    <input type="text" class="form-control" id="nameInput" name="nameInput" placeholder="Sergio" required>
+                </div>
+                <div class="mb-3">
+                    <label for="emailInput" class="form-label">Email: </label>
+                    <input type="email" class="form-control" id="emailInput" name="emailInput" placeholder="name@example.com" required>
+                </div>  
+                <div class="mb-3">
+                    <label for="numberInput" class="form-label">Telefono: </label>
+                    <input type="number" class="form-control" id="numberInput" name="numberInput" placeholder="654321321" required>
+                </div> 
+                <div class="d-grid gap-2 col-6 mx-auto">
+                    <button class="btn btn-primary btn-lg" type="submit">Crear reserva</button>
+                </div>
+            </form>
+        </div>
+    </div>
+ 
+{% endblock %}
+
