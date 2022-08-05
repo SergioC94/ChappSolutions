@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: RoomRepository::class)]
+#[UniqueConstraint(name: "number", columns:["number"])]
 class Room
 {
     #[ORM\Id]
@@ -88,4 +89,9 @@ class Room
 
         return $this;
     }
+
+    public function __toString(): string
+{
+    return $this->getId();  // or some string field in your Vegetal Entity 
+}
 }

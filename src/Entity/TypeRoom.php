@@ -27,6 +27,9 @@ class TypeRoom
     #[ORM\OneToMany(mappedBy: 'typeRoom', targetEntity: Room::class)]
     private Collection $rooms;
 
+    #[ORM\Column]
+    private ?int $MaxGuests = null;
+
     public function __construct()
     {
         $this->rooms = new ArrayCollection();
@@ -99,6 +102,18 @@ class TypeRoom
                 $room->setTypeRoom(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getMaxGuests(): ?int
+    {
+        return $this->MaxGuests;
+    }
+
+    public function setMaxGuests(int $MaxGuests): self
+    {
+        $this->MaxGuests = $MaxGuests;
 
         return $this;
     }

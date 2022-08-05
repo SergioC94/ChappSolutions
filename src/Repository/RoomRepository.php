@@ -39,28 +39,35 @@ class RoomRepository extends ServiceEntityRepository
         }
     }
 
-//    /**
-//     * @return Room[] Returns an array of Room objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('r')
-//            ->andWhere('r.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('r.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    /**
+      * Search all rooms filterws by date and number of guest
+      * @return Room[] Returns an array of room objects
+     */
+    public function findAvailableByData(array $dates, int $numberGuest): array
+    {
 
-//    public function findOneBySomeField($value): ?Room
-//    {
-//        return $this->createQueryBuilder('r')
-//            ->andWhere('r.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+        $query = $this->getEntityManager()->createQuery("SELECT DISTINCT c, COUNT(c) FROM App\Entity\Room c WHERE c.id NOT IN 
+        (SELECT IDENTITY(r.room) FROM App\Entity\Reservation r WHERE :startDate BETWEEN r.entryDate and r.exitDate AND :endDate BETWEEN r.entryDate and r.exitDate)
+        AND c.typeRoom IN (SELECT t.id FROM App\Entity\TypeRoom t where t.MaxGuests >= :numberGuest) GROUP BY c.typeRoom ORDER BY c.typeRoom");
+        $query->setParameter('startDate', $dates[0]);
+        $query->setParameter('endDate', $dates[1]);
+        $query->setParameter('numberGuest', $numberGuest);
+        return $query->getResult();
+    }
+    /**
+      * Search all rooms filterws by date and number of guest
+      * @return Room Returns an array of room objects
+     */
+    public function findAvailableByTypeRoom(array $dates, int $typeRoom): Room
+    {
+
+        $query = $this->getEntityManager()->createQuery("SELECT c FROM App\Entity\Room c WHERE c.id NOT IN 
+        (SELECT IDENTITY(r.room) FROM App\Entity\Reservation r WHERE :startDate BETWEEN r.entryDate and r.exitDate AND :endDate BETWEEN r.entryDate and r.exitDate)
+        AND c.typeRoom = :typeRoom");
+        $query->setParameter('startDate', $dates[0]);
+        $query->setParameter('endDate', $dates[1]);
+        $query->setParameter('typeRoom', $typeRoom);
+        $query->setMaxResults(1);
+        return $query->getOneOrNullResult();
+    }
 }

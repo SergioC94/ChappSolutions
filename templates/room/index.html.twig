@@ -1,0 +1,81 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello RoomController!{% endblock %}
+
+{% block body %}
+<style>
+    .buscarButton{ align-self: center; text-align: center;}
+</style>
+
+<div class="p-3" style="border:1px solid #000000;" >
+    <form  method="post">
+        <div class="row">
+            <div class="col buscarButton">
+                <h5>Escoge dos fechas</h5>
+                <input type="text" name="daterange" />
+            </div>
+            <div class="col buscarButton">
+                <h5>Número de huéspedes</h5>
+                <select class="form-select" id="SelectGuests" name="guests" required>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5 o más</option>
+                </select>
+            </div>
+            <div class="col buscarButton">
+                <button type="submit" id="SearchButton" class="btn btn-primary btn-lg">Buscar habitación</button>
+            </div>
+        </div>
+    </form>
+</div>
+<div id="RoomsList">
+    
+</div>
+    
+<script>
+    $(function() {
+        
+      $('input[name="daterange"]').daterangepicker({
+        startDate: moment(),
+        endDate: moment().add(1, 'days'),
+        locale: {format: 'YYYY-MM-DD'},
+        opens: 'left',
+        isInvalidDate: function(date){
+            if(date.year() > "2022" || date < moment().subtract(1,'days')){
+                return true;
+            }
+        }
+      },);
+    });
+
+    $('#SearchButton').click(function(e) {
+        e.preventDefault();
+        $.ajax({
+            type: "POST",
+            url: "/room/new",
+            data:{
+                daterange: $('input[name="daterange"]').val(),
+                guests: $('#SelectGuests').val()
+            },
+            success: function(result) {
+                $('#RoomsList').html(result);
+            },
+            error: function(result) {
+                console.log(result)
+            }
+        });
+    });
+</script>
+{% endblock %}
+
+{% block javascripts %}
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+{% endblock %}
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+{% endblock %}

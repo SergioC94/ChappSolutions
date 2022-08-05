@@ -1,0 +1,25 @@
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">Tipo de habitación</th>
+      <th scope="col">Habitaciones disponibles / Total</th>
+      <th scope="col">Precio total (€)</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for room in roomsAvailable %}
+    <tr>
+      <th>{{room[0].typeRoom.name}}</th>
+      <td>{{room[1]}} / {{room[0].typeRoom.numberOfRooms}}</td>
+      <td>{{totalDays * room[0].typeRoom.PriceDay}}</td>
+      <td>
+        <form action="{{ path('app_reservation_contactDetail') }}" method="post">
+          <input type="hidden" id="typeId" name="typeId" value="{{room[0].typeRoom.id}}">          
+          <button type="submit" class="btn btn-primary">Seleccionar</button>
+        </form>
+      </td>
+    </tr>
+   {% endfor %}
+  </tbody>
+</table>
