@@ -39,28 +39,18 @@ class ReservationRepository extends ServiceEntityRepository
         }
     }
 
-//    /**
-//     * @return Reservation[] Returns an array of Reservation objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('r')
-//            ->andWhere('r.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('r.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    /**
+     * Search reservations between two dates
+     * @return Reservation[] an array of Reservation objects
+     */
+    public function findReservedRoomByDates(array $dates): array
+    {
 
-//    public function findOneBySomeField($value): ?Reservation
-//    {
-//        return $this->createQueryBuilder('r')
-//            ->andWhere('r.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+        $query = $this->getEntityManager()->createQuery("SELECT c FROM App\Entity\Room c WHERE c.id NOT IN (SELECT IDENTITY(r.room) FROM App\Entity\Reservation r WHERE :startDate BETWEEN r.entryDate and r.exitDate AND :endDate BETWEEN r.entryDate and r.exitDate)");
+        $query->setParameter('startDate', $dates[0]);
+        $query->setParameter('endDate', $dates[1]);
+        return $query->getResult();
+
+
+    }
 }

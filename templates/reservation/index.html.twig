@@ -1,0 +1,62 @@
+{% extends 'base.html.twig' %}
+        {% block stylesheets %}
+        {{ parent() }}
+        {% endblock %}
+{% block title %}Lista reservas{% endblock %}
+
+{% block body %}
+    <h1>Lista de reservas</h1>
+
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Fecha entrada</th>
+                <th>Fecha salida</th>
+                <th>Tipo habitación</th>
+                <th>Nº Huéspedes</th>
+                <th>Datos de contacto</th>
+                <th>Precio total (€)</th>
+                <th>Localizador</th>
+                <th>Número de habitación</th>
+                <th>Acciones</th>
+
+            </tr>
+        </thead>
+        <tbody>
+        {% for reservation in reservations %}
+            <tr>
+                <td>{{ reservation.id }}</td>
+                <td>{{ reservation.entryDate ? reservation.entryDate|date('Y-m-d') : '' }}</td>
+                <td>{{ reservation.exitDate ? reservation.exitDate|date('Y-m-d') : '' }}</td>
+                <td>{{ reservation.room.typeRoom.name }}</td>
+                <td>{{ reservation.guestNumber }}</td>
+                <td>
+                    {% for key, data in reservation.ContactDetails %}
+                        <li>{{ key }}: {{ data }}</li>
+                    {% endfor %}
+                </td>
+                <td>{{ reservation.price }}</td>
+                <td>{{ reservation.locator }}</td>
+                <td>{{ reservation.room.number }}</td>
+                <td>
+                    <a href="{{ path('app_reservation_edit', {'id': reservation.id}) }}"><button class="btn btn-secondary">Editar</button></a>
+                    {{ include('reservation/_delete_form.html.twig') }}
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="10">no records found</td>
+            </tr>
+        {% endfor %}
+
+
+        </tbody>   
+    </table>
+    <div class="me-5" style="text-align:right">
+        <a href="{{ path('app_room_index') }}">
+            <button class="btn btn-primary btn-lg">Crear nueva reserva</button>
+        </a> 
+    </div>
+{% endblock %}
+
