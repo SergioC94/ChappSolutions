@@ -1,0 +1,26 @@
+<div class="container p-3 m-2 showDetailsContainer">
+    <div class="row pb-3">
+        <h4>Datos reserva</h4>
+    </div>
+    <div class="row pb-3">
+        <div class="col">
+            <label><strong>Fecha entrada: </strong>{{dates[0]}}</label>
+        </div>
+        <div class="col">
+            <label><strong>Fecha salida: </strong>{{dates[1]}}</label>
+        </div>
+    </div>
+    <div class="row pb-3">
+        <div class="col">
+            <label><strong>Tipo de habitación: </strong>{{typeRoom.name}}</label>
+        </div>
+        <div class="col">
+            <label><strong>Número huéspedes: </strong>{{numberGuests}}</label>
+        </div>
+    </div>
+    <div class="row pb-3">
+        <div class="col">
+            <label><strong>Precio total: </strong>{{totalDays * typeRoom.PriceDay}}€</label>
+        </div>
+    </div>
+</div>

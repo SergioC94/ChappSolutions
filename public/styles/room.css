@@ -1,0 +1,14 @@
+/*
+ * searchButton in indexRoom
+ */
+.searchButton{ 
+    align-self: center; 
+    text-align: center;
+}
+
+/*
+ * Container in Room
+ */
+.containerDatesRoom{
+    border:1px solid #000000;
+}

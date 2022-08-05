@@ -1,0 +1,16 @@
+/*
+ *Pagination in reservation/index
+ */
+ul li.disabled a.page-link { cursor: default;
+    pointer-events: none;        
+    text-decoration: none;
+    color: grey; 
+}
+
+/*
+ *Container in showDetails
+ */
+.showDetailsContainer{
+    border:1px solid #000000; 
+    width:initial;
+}

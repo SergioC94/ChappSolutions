@@ -1,26 +1,21 @@
 {% extends 'base.html.twig' %}
-        {% block stylesheets %}
-        {{ parent() }}
-        {% endblock %}
 {% block title %}Lista reservas{% endblock %}
 
 {% block body %}
     <h1>Lista de reservas</h1>
-
     <table class="table table-hover">
         <thead>
             <tr>
-                <th>ID</th>
-                <th>Fecha entrada</th>
-                <th>Fecha salida</th>
-                <th>Tipo habitación</th>
-                <th>Nº Huéspedes</th>
-                <th>Datos de contacto</th>
-                <th>Precio total (€)</th>
-                <th>Localizador</th>
-                <th>Número de habitación</th>
-                <th>Acciones</th>
-
+                <th class="col-1">ID</th>
+                <th class="col-1">Fecha entrada</th>
+                <th class="col-1">Fecha salida</th>
+                <th class="col-1">Tipo habitación</th>
+                <th class="col-1">Nº Huéspedes</th>
+                <th class="col-2">Datos de contacto</th>
+                <th class="col-1">Precio total (€)</th>
+                <th class="col-1">Localizador</th>
+                <th class="col-1">Número de habitación</th>
+                <th class="col-4">Acciones</th>
             </tr>
         </thead>
         <tbody>
@@ -49,14 +44,24 @@
                 <td colspan="10">no records found</td>
             </tr>
         {% endfor %}
-
-
         </tbody>   
     </table>
-    <div class="me-5" style="text-align:right">
-        <a href="{{ path('app_room_index') }}">
-            <button class="btn btn-primary btn-lg">Crear nueva reserva</button>
-        </a> 
+    <div class="row">
+        <div class="col">
+            {{ include('reservation/pagination_index.html.twig') }}
+        </div>
+        <div class="col">
+            <div class="me-5" style="text-align:right">
+                <a href="{{ path('app_room_index') }}">
+                    <button class="btn btn-primary btn-lg">Crear nueva reserva</button>
+                </a> 
+            </div>
+        </div>
     </div>
+{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+    <link rel="stylesheet" href="{{asset('styles/reservation.css') }}">
 {% endblock %}
 
