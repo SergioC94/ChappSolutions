@@ -40,13 +40,21 @@ class RoomRepository extends ServiceEntityRepository
     }
 
     /**
-      * Search all rooms filterws by date and number of guest
-      * @return Room[] Returns an array of room objects
+      * Search all rooms filterws by date and number of guest.
+      * This query returns the first available room of each type and the number of available rooms for those dates.
+      * Example : array[
+      *  0 => array:[
+      *      "room" => [Object Room],
+      *      "availableType" => int
+      *      ]
+      *   ]
+      * 
+      * @return array[] Returns an array of room objects
      */
     public function findAvailableByData(array $dates, int $numberGuest): array
     {
 
-        $query = $this->getEntityManager()->createQuery("SELECT DISTINCT c, COUNT(c) FROM App\Entity\Room c WHERE c.id NOT IN 
+        $query = $this->getEntityManager()->createQuery("SELECT DISTINCT c , COUNT(c) FROM App\Entity\Room c WHERE c.id NOT IN 
         (SELECT IDENTITY(r.room) FROM App\Entity\Reservation r WHERE :startDate BETWEEN r.entryDate and r.exitDate AND :endDate BETWEEN r.entryDate and r.exitDate)
         AND c.typeRoom IN (SELECT t.id FROM App\Entity\TypeRoom t where t.MaxGuests >= :numberGuest) GROUP BY c.typeRoom ORDER BY c.typeRoom");
         $query->setParameter('startDate', $dates[0]);
@@ -55,7 +63,7 @@ class RoomRepository extends ServiceEntityRepository
         return $query->getResult();
     }
     /**
-      * Search all rooms filterws by date and number of guest
+      * Search first available room on these dates and typeROom
       * @return Room Returns an array of room objects
      */
     public function findAvailableByTypeRoom(array $dates, int $typeRoom): Room

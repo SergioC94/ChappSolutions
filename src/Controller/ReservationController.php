@@ -13,82 +13,86 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class ReservationController extends AbstractController
 {
-    #[Route('/', name: 'app_index', methods: ['GET'])]
-    #[Route('/reservation', name: 'app_reservation_index', methods: ['GET'])]
-    public function index(ReservationRepository $reservationRepository): Response
+
+    const PAGINATOR_PAGE_SIZE = 6;
+
+    /**
+     * Gets the reservations paginated
+     * @param $page CurrentPage to paginate
+     * @return Response Returns reservation/index with reservations, currentPage and pagesCount
+     */
+    #[Route('/{page<\d+>?1}', name: 'app_index', methods: ['GET'])]
+    #[Route('/reservation/{page<\d+>?1}', name: 'app_reservation_index', methods: ['GET'])]
+    public function index(int $page, ReservationRepository $reservationRepository): Response
     {
-        return $this->render('reservation/index.html.twig', [
-            'reservations' => $reservationRepository->findAll(),
-        ]);
-    }
 
-    #[Route('/reservation/new', name: 'app_reservation_new', methods: ['POST'])]
-    public function new(Request $request, ReservationRepository $reservationRepository, RoomRepository $roomRepository)
-    {
-        $session = new Session();
+        $error = "";
+        try{
 
-         $reservation = new Reservation();
-         $dates = $session->get('dates');
+            $reservations  = $reservationRepository->getPaginateReservations(self::PAGINATOR_PAGE_SIZE,$page);
+            $pagesCount = ceil( count($reservations) / self::PAGINATOR_PAGE_SIZE);
 
-         $reservation->setEntryDate(new DateTime($dates[0]));
-         $reservation->setExitDate(new DateTime($dates[1]));
-         $reservation->setGuestNumber($session->get('numberGuests'));
-         $reservation->setLocator(uniqid());
-         $room = $roomRepository->findAvailableByTypeRoom($dates,$session->get('typeRoom'));
-         $reservation->setPrice($session->get('totalDays') * $room->getTypeRoom()->getPriceDay());
-         $reservation->setRoom($room);
-         $reservation->setContactDetails([
-            'nombre' => $request->request->get('nameInput'),
-            'email'  => $request->request->get('emailInput'),
-            'telefono' => $request->request->get('telInput') 
-         ]);
-
-         $reservationRepository->add($reservation, true);
-         return $this->redirectToRoute('app_reservation_index', [], Response::HTTP_SEE_OTHER);
-        // $reservation = new Reservation();
-        // $form = $this->createForm(ReservationType::class, $reservation);
-        
-        // $form->handleRequest($request);
-
-        // if ($form->isSubmitted() && $form->isValid()) {
-        //     $reservationRepository->add($reservation, true);
-
-        //     return $this->redirectToRoute('app_reservation_index', [], Response::HTTP_SEE_OTHER);
-        // }
-
-        // return $this->renderForm('reservation/new.html.twig', [
-        //     'reservation' => $reservation,
-        //     'form' => $form,
-        // ]);
-    }
-
-    #[Route('/reservation/{id}', name: 'app_reservation_show', methods: ['GET'])]
-    public function show(Reservation $reservation): Response
-    {
-        return $this->render('reservation/show.html.twig', [
-            'reservation' => $reservation,
-        ]);
-    }
-
-    #[Route('/reservation/{id}/edit', name: 'app_reservation_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Reservation $reservation, ReservationRepository $reservationRepository): Response
-    {
-        $form = $this->createForm(ReservationType::class, $reservation);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $reservationRepository->add($reservation, true);
-
-            return $this->redirectToRoute('app_reservation_index', [], Response::HTTP_SEE_OTHER);
+        }catch(\Exception $exception){
+            $error = "No se han encontrado reservas";
         }
+         
+        return $this->render('reservation/index.html.twig', array(
+            "reservations"=> $reservations,
+            "currentPage" => $page,
+            "pagesCount" => $pagesCount,
+            "error"      => $error
+        ));
+    }
 
-        return $this->renderForm('reservation/edit.html.twig', [
-            'reservation' => $reservation,
-            'form' => $form,
-        ]);
+    /**
+     * Creates the reservation object with session parameters and form parameters (in request)
+     * if there is an exception or an error render room/index and show flash
+     */
+    #[Route('/reservation/new', name: 'app_reservation_new', methods: ['POST'])]
+    public function new(Request $request, ReservationRepository $reservationRepository, RoomRepository $roomRepository, ValidatorInterface $validator)
+    {
+         $session = new Session();
+         $reservation = new Reservation();
+         $countException = 0;
+
+         try{
+             $dates = $session->get('dates');
+    
+             $reservation->setEntryDate(new DateTime($dates[0]));
+             $reservation->setExitDate(new DateTime($dates[1]));
+    
+             $reservation->setGuestNumber($session->get('numberGuests'));
+             $reservation->setLocator(uniqid());
+    
+             $room = $roomRepository->findAvailableByTypeRoom($dates,$session->get('typeRoom'));
+             $reservation->setPrice($session->get('totalDays') * $room->getTypeRoom()->getPriceDay());
+    
+             $reservation->setRoom($room);
+             $reservation->setContactDetails([
+                'nombre' => $request->request->get('nameInput'),
+                'email'  => $request->request->get('emailInput'),
+                'telefono' => $request->request->get('numberInput') 
+             ]);
+
+             $errors = $validator->validate($reservation);
+
+         }catch(\Expception $exception){
+            $countException ++;
+         }
+        
+         if (count($errors) > 0 || $countException > 0) {
+            $this->addFlash('notice', 'Hay un error en la reserva, por favor pongase en contacto.');
+            return $this->render('room/index.html.twig', []);
+        }
+     
+         $reservationRepository->add($reservation, true);
+         $this->addFlash('ok', 'Reserva realizada correctamente');
+         return $this->redirectToRoute('app_reservation_index', [], Response::HTTP_SEE_OTHER);
+        
     }
 
     #[Route('/reservation/reservation/{id}', name: 'app_reservation_delete', methods: ['POST'])]
@@ -101,6 +105,9 @@ class ReservationController extends AbstractController
         return $this->redirectToRoute('app_reservation_index', [], Response::HTTP_SEE_OTHER);
     }
 
+    /**
+     * Store the type id in a session variable and return conctactDetails form
+     */
     #[Route('/contactDetail', name: 'app_reservation_contactDetail', methods: ['POST'])]
     public function contactDetail(Request $request, TypeRoomRepository $typeRoomRepository): Response
     {

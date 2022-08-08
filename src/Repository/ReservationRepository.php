@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Reservation;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -50,7 +51,20 @@ class ReservationRepository extends ServiceEntityRepository
         $query->setParameter('startDate', $dates[0]);
         $query->setParameter('endDate', $dates[1]);
         return $query->getResult();
-
-
     }
+
+    public function getPaginateReservations(int $pageSize=3, int $currentPage){
+        $em=$this->getEntityManager();
+         
+        //Consulta DQL
+        $dql = "SELECT r FROM App\Entity\Reservation r ORDER BY r.id DESC";
+        $query = $em->createQuery($dql)
+                               ->setFirstResult($pageSize * ($currentPage - 1))
+                               ->setMaxResults($pageSize);
+ 
+        $paginator = new Paginator($query, $fetchJoinCollection = true);
+ 
+        return $paginator;
+    }
+
 }

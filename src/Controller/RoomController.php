@@ -15,11 +15,15 @@ class RoomController extends AbstractController
     #[Route('/room', name: 'app_room_index')]
     public function index(): Response
     {
-        return $this->render('room/index.html.twig', [
-            'controller_name' => 'RoomController',
-        ]);
+        return $this->render('room/index.html.twig');
     }
 
+    /**
+     * Saves dates, total days and number of guests in session.
+     * Gets the rooms availables on those dates with $numberGuests
+     * $dates[0] => $entryDate
+     * $dates[1] => $exitDate
+     */
     #[Route('/room/new', name: 'app_room_new', methods: ['POST'])]
     public function new(Request $request, RoomRepository $roomRepository)
     {
@@ -37,8 +41,6 @@ class RoomController extends AbstractController
         $session->set('numberGuests', $numberGuests);
         $session->set('dates', $dates);
 
-
         return $this->render('room/table.html.twig', array('roomsAvailable' => $roomsAvailable, 'totalDays' => $diff->days));
-        
     }
 }

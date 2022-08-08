@@ -10,12 +10,13 @@
     <div class="row">
         <div class="col">
             {{ include('reservation/showDetails.html.twig') }}
+            <a href="{{ path('app_room_index') }}"><button class="btn btn-secondary btn-lg m-3" type="button">Volver</button></a>
         </div>
         <div class="col">
             <form action="{{ path('app_reservation_new') }}" method="post">
                 <div class="mb-3">
                     <label for="nameInput" class="form-label">Nombre: </label>
-                    <input type="text" class="form-control" id="nameInput" name="nameInput" placeholder="Sergio" required>
+                    <input type="text" class="form-control" id="nameInput" name="nameInput" placeholder="Sergio" required pattern="^[A-Za-z]+$" >
                 </div>
                 <div class="mb-3">
                     <label for="emailInput" class="form-label">Email: </label>
@@ -23,7 +24,7 @@
                 </div>  
                 <div class="mb-3">
                     <label for="numberInput" class="form-label">Telefono: </label>
-                    <input type="number" class="form-control" id="numberInput" name="numberInput" placeholder="654321321" required>
+                    <input type="tel" class="form-control" id="numberInput" name="numberInput" placeholder="654321321" required pattern="[0-9]{9}">
                 </div> 
                 <div class="d-grid gap-2 col-6 mx-auto">
                     <button class="btn btn-primary btn-lg" type="submit">Crear reserva</button>

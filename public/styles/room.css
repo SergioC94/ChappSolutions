@@ -12,3 +12,11 @@
 .containerDatesRoom{
     border:1px solid #000000;
 }
+
+/*
+ *Message when there aren't rooms
+ */
+.errorRooms{
+    text-align: center;
+    color:red
+}
