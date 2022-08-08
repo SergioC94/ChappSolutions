@@ -55,23 +55,27 @@ class RoomRepository extends ServiceEntityRepository
     {
 
         $query = $this->getEntityManager()->createQuery("SELECT DISTINCT c , COUNT(c) FROM App\Entity\Room c WHERE c.id NOT IN 
-        (SELECT IDENTITY(r.room) FROM App\Entity\Reservation r WHERE :startDate BETWEEN r.entryDate and r.exitDate AND :endDate BETWEEN r.entryDate and r.exitDate)
-        AND c.typeRoom IN (SELECT t.id FROM App\Entity\TypeRoom t where t.MaxGuests >= :numberGuest) GROUP BY c.typeRoom ORDER BY c.typeRoom");
+        (SELECT IDENTITY(r.room) FROM App\Entity\Reservation r WHERE :startDate BETWEEN r.entryDate and r.exitDate AND :endDate BETWEEN r.entryDate and r.exitDate
+         OR :startDate <= r.entryDate and :endDate >= r.entryDate
+         OR :startDate < r.exitDate and :endDate  > r.exitDate)
+         AND c.typeRoom IN (SELECT t.id FROM App\Entity\TypeRoom t where t.MaxGuests >= :numberGuest) GROUP BY c.typeRoom ORDER BY c.typeRoom");
         $query->setParameter('startDate', $dates[0]);
         $query->setParameter('endDate', $dates[1]);
         $query->setParameter('numberGuest', $numberGuest);
         return $query->getResult();
     }
     /**
-      * Search first available room on these dates and typeROom
-      * @return Room Returns an array of room objects
+      * Search first available room on these dates and typeRoom
+      * @return Room or null
      */
-    public function findAvailableByTypeRoom(array $dates, int $typeRoom): Room
+    public function findAvailableByTypeRoom(array $dates, int $typeRoom)
     {
 
         $query = $this->getEntityManager()->createQuery("SELECT c FROM App\Entity\Room c WHERE c.id NOT IN 
-        (SELECT IDENTITY(r.room) FROM App\Entity\Reservation r WHERE :startDate BETWEEN r.entryDate and r.exitDate AND :endDate BETWEEN r.entryDate and r.exitDate)
-        AND c.typeRoom = :typeRoom");
+        (SELECT IDENTITY(r.room) FROM App\Entity\Reservation r WHERE :startDate BETWEEN r.entryDate and r.exitDate AND :endDate BETWEEN r.entryDate and r.exitDate
+        OR :startDate <= r.entryDate and :endDate >= r.entryDate
+        OR :startDate < r.exitDate and :endDate  > r.exitDate)
+        AND c.typeRoom = :typeRoom ORDER BY c.id");
         $query->setParameter('startDate', $dates[0]);
         $query->setParameter('endDate', $dates[1]);
         $query->setParameter('typeRoom', $typeRoom);

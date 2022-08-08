@@ -53,18 +53,20 @@ class ReservationRepository extends ServiceEntityRepository
         return $query->getResult();
     }
 
-    public function getPaginateReservations(int $pageSize=3, int $currentPage){
+    /**
+     * Gets all reservations paginated
+     */
+    public function getPaginateReservations(int $pageSize, int $currentPage){
         $em=$this->getEntityManager();
          
-        //Consulta DQL
         $dql = "SELECT r FROM App\Entity\Reservation r ORDER BY r.id DESC";
         $query = $em->createQuery($dql)
                                ->setFirstResult($pageSize * ($currentPage - 1))
                                ->setMaxResults($pageSize);
  
-        $paginator = new Paginator($query, $fetchJoinCollection = true);
+        $reservations = new Paginator($query, $fetchJoinCollection = true);
  
-        return $paginator;
+        return $reservations;
     }
 
 }

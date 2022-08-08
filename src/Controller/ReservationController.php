@@ -8,6 +8,7 @@ use App\Repository\ReservationRepository;
 use App\Repository\RoomRepository;
 use App\Repository\TypeRoomRepository;
 use DateTime;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -30,21 +31,13 @@ class ReservationController extends AbstractController
     public function index(int $page, ReservationRepository $reservationRepository): Response
     {
 
-        $error = "";
-        try{
-
-            $reservations  = $reservationRepository->getPaginateReservations(self::PAGINATOR_PAGE_SIZE,$page);
-            $pagesCount = ceil( count($reservations) / self::PAGINATOR_PAGE_SIZE);
-
-        }catch(\Exception $exception){
-            $error = "No se han encontrado reservas";
-        }
-         
+        $reservations  = $reservationRepository->getPaginateReservations(self::PAGINATOR_PAGE_SIZE,$page);
+        $pagesCount = ceil( count($reservations) / self::PAGINATOR_PAGE_SIZE);
+ 
         return $this->render('reservation/index.html.twig', array(
             "reservations"=> $reservations,
             "currentPage" => $page,
-            "pagesCount" => $pagesCount,
-            "error"      => $error
+            "pagesCount" => $pagesCount
         ));
     }
 
@@ -65,10 +58,15 @@ class ReservationController extends AbstractController
              $reservation->setEntryDate(new DateTime($dates[0]));
              $reservation->setExitDate(new DateTime($dates[1]));
     
+             $room = $roomRepository->findAvailableByTypeRoom($dates,$session->get('typeRoom'));
+             
+             if(!$room){
+                throw new Exception('No existe habitación de ese tipo');
+             }
+
              $reservation->setGuestNumber($session->get('numberGuests'));
              $reservation->setLocator(uniqid());
     
-             $room = $roomRepository->findAvailableByTypeRoom($dates,$session->get('typeRoom'));
              $reservation->setPrice($session->get('totalDays') * $room->getTypeRoom()->getPriceDay());
     
              $reservation->setRoom($room);
@@ -85,6 +83,7 @@ class ReservationController extends AbstractController
          }
         
          if (count($errors) > 0 || $countException > 0) {
+            $session->clear();
             $this->addFlash('notice', 'Hay un error en la reserva, por favor pongase en contacto.');
             return $this->render('room/index.html.twig', []);
         }

@@ -3,8 +3,8 @@
 
 {% block body %}
     <h1>Lista de reservas</h1>
-    {% if error != "" %}
-        <h5>{{ error }}</h5>
+    {% if reservations|length == 0 %}
+        <h5 class="errorReservation">No hay reservas</h5>
     {% else %}
     <table class="table table-hover">
         <thead>
@@ -40,11 +40,11 @@
                 <td>{{ reservation.room.number }}</td>
                 {% if reservation.exitDate|date('Y-m-d') < "now"|date('Y-m-d') %}
                 <td>
-                    <button type="button" class="btn btn-success buttonIndex">Finalizada</button>
+                    <button type="button" class="btn btn-success stateButton">Finalizada</button>
                 </td>
                 {% else %}
                 <td>
-                    <button type="button" class="btn btn-info buttonIndex">En proceso</button>
+                    <button type="button" class="btn btn-info stateButton">En proceso</button>
                 </td>
                 {% endif %}
                 <td>

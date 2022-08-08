@@ -1,8 +1,10 @@
 <nav aria-label="Page navigation example">
     <ul class="pagination">
+        {% if pagesCount > 0 %}
         <li {{ currentPage == 1 ? 'class="disabled"' }}>
             <a class="page-link" tabindex="-1"href="{{ path('app_index', {page: currentPage-1 < 1 ? 1 : currentPage-1}) }}">«</a>
         </li>
+        
         {% for i in 1..pagesCount %}
             {% if currentPage == i %}
             <li class="page-item active"><a class="page-link" href="{{ path('app_index', {'page': i}) }}">{{ i }}</a></li>
@@ -14,5 +16,6 @@
         <li {{ currentPage == pagesCount ? 'class="disabled"' }}>
             <a class="page-link" href="{{ path('app_index', {page: currentPage+1 <= pagesCount ? currentPage+1 : currentPage}) }}">»</a>
         </li>
+        {% endif %}
     </ul>
 </nav>

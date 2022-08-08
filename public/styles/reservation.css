@@ -15,6 +15,17 @@ ul li.disabled a.page-link { cursor: default;
     width:initial;
 }
 
-.buttonIndex{
+/*
+ * state button in index
+*/
+.stateButton{
     pointer-events: none;
+}
+
+/*
+ *Message when there aren't reservations
+ */
+ .errorReservation{
+    text-align: center;
+    color:red
 }
