@@ -1,6 +1,7 @@
 {% if roomsAvailable == [] %}
   <h5 class="errorRooms">No hay habitaciones con esos filtros</h5>
 {% else %}
+<div class="table-responsive">
 <table class="table">
   <thead>
     <tr>
@@ -26,4 +27,5 @@
    {% endfor %}
   </tbody>
 </table>
+</div>
 {% endif %}

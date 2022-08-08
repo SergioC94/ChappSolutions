@@ -6,54 +6,56 @@
     {% if reservations|length == 0 %}
         <h5 class="errorReservation">No hay reservas</h5>
     {% else %}
-    <table class="table table-hover">
-        <thead>
-            <tr>
-                <th class="col-1">ID</th>
-                <th class="col-1">Fecha entrada</th>
-                <th class="col-1">Fecha salida</th>
-                <th class="col-1">Tipo habitación</th>
-                <th class="col-1">Nº Huéspedes</th>
-                <th class="col-2">Datos de contacto</th>
-                <th class="col-1">Precio total (€)</th>
-                <th class="col-1">Localizador</th>
-                <th class="col-1">Número de habitación</th>
-                <th class="col-1">Estado</th>
-                <th class="col-4">Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for reservation in reservations %}
-            <tr>
-                <td>{{ reservation.id }}</td>
-                <td>{{ reservation.entryDate ? reservation.entryDate|date('Y-m-d') : '' }}</td>
-                <td>{{ reservation.exitDate ? reservation.exitDate|date('Y-m-d') : '' }}</td>
-                <td>{{ reservation.room.typeRoom.name }}</td>
-                <td>{{ reservation.guestNumber }}</td>
-                <td>
-                    {% for key, data in reservation.ContactDetails %}
-                        <li>{{ key }}: {{ data }}</li>
-                    {% endfor %}
-                </td>
-                <td>{{ reservation.price }}</td>
-                <td>{{ reservation.locator }}</td>
-                <td>{{ reservation.room.number }}</td>
-                {% if reservation.exitDate|date('Y-m-d') < "now"|date('Y-m-d') %}
-                <td>
-                    <button type="button" class="btn btn-success stateButton">Finalizada</button>
-                </td>
-                {% else %}
-                <td>
-                    <button type="button" class="btn btn-info stateButton">En proceso</button>
-                </td>
-                {% endif %}
-                <td>
-                    {{ include('reservation/_delete_form.html.twig') }}
-                </td>
-            </tr>
-        {% endfor %}
-        </tbody>   
-    </table>
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th class="col-1">ID</th>
+                    <th class="col-1">Fecha entrada</th>
+                    <th class="col-1">Fecha salida</th>
+                    <th class="col-1">Tipo habitación</th>
+                    <th class="col-1">Nº Huéspedes</th>
+                    <th class="col-2">Datos de contacto</th>
+                    <th class="col-1">Precio total (€)</th>
+                    <th class="col-1">Localizador</th>
+                    <th class="col-1">Número de habitación</th>
+                    <th class="col-1">Estado</th>
+                    <th class="col-4">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for reservation in reservations %}
+                <tr>
+                    <td>{{ reservation.id }}</td>
+                    <td>{{ reservation.entryDate ? reservation.entryDate|date('Y-m-d') : '' }}</td>
+                    <td>{{ reservation.exitDate ? reservation.exitDate|date('Y-m-d') : '' }}</td>
+                    <td>{{ reservation.room.typeRoom.name }}</td>
+                    <td>{{ reservation.guestNumber }}</td>
+                    <td>
+                        {% for key, data in reservation.ContactDetails %}
+                            <li>{{ key }}: {{ data }}</li>
+                        {% endfor %}
+                    </td>
+                    <td>{{ reservation.price }}</td>
+                    <td>{{ reservation.locator }}</td>
+                    <td>{{ reservation.room.number }}</td>
+                    {% if reservation.exitDate|date('Y-m-d') < "now"|date('Y-m-d') %}
+                    <td>
+                        <button type="button" class="btn btn-success stateButton">Finalizada</button>
+                    </td>
+                    {% else %}
+                    <td>
+                        <button type="button" class="btn btn-info stateButton">En proceso</button>
+                    </td>
+                    {% endif %}
+                    <td>
+                        {{ include('reservation/_delete_form.html.twig') }}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>   
+        </table>
+    </div>
     {% endif %}
     <div class="row">
         <div class="col">
